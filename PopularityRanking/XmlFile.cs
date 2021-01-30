@@ -8,8 +8,13 @@ namespace PopularityRanking
 {
     public static class XmlFile
     {
-        public static T Import<T>(string path)
+        public static T Import<T>(string path) where T : new()
         {
+            if (!File.Exists(path))
+            {
+                Export(path, new T());
+            }
+
             using StreamReader reader = new StreamReader(path);
             XmlSerializer serializer = new XmlSerializer(typeof(T));
             return (T)serializer.Deserialize(reader);
