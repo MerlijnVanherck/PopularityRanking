@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.ML.Probabilistic.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
@@ -10,6 +11,8 @@ namespace PopularityRanking
     [XmlRoot(ElementName = "ranking")]
     public class Ranking : IXmlSerializable
     {
+        public static readonly InferenceEngine Engine = new InferenceEngine();
+
         public List<Participant> Participants { get; set; } = new List<Participant>();
 
         public Participant[] RandomMatchup(int number)

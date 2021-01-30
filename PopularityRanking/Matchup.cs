@@ -21,8 +21,8 @@ namespace PopularityRanking
             b.SetTo(winnerPopularity > loserPopularity);
             b.ObservedValue = true;
 
-            var winnerPost = Program.Engine.Infer<Gaussian>(winnerPopularity);
-            var loserPost = Program.Engine.Infer<Gaussian>(loserPopularity);
+            var winnerPost = Ranking.Engine.Infer<Gaussian>(winnerPopularity);
+            var loserPost = Ranking.Engine.Infer<Gaussian>(loserPopularity);
 
             winner.popularityGaussian = winnerPost;
             loser.popularityGaussian = loserPost;
@@ -53,7 +53,7 @@ namespace PopularityRanking
                 }
             }
 
-            var participantPosts = Program.Engine.Infer<Gaussian[]>(popularities);
+            var participantPosts = Ranking.Engine.Infer<Gaussian[]>(popularities);
 
             for (int i = 0; i < participants.Length; i++)
                 participants[i].popularityGaussian = participantPosts[i];
