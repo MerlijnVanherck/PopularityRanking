@@ -51,5 +51,10 @@ namespace PopularityRanking
             writer.WriteAttributeString("deviation",
                 Math.Sqrt(popularityGaussian.GetVariance()).ToString());
         }
+
+        public override string ToString()
+        {
+            return $"#{Id} {Name} ({Popularity})";
+        }
     }
 }
