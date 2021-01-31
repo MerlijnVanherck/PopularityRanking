@@ -29,7 +29,7 @@ namespace PopularityRanking.WPF
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void FileButton_Click(object sender, RoutedEventArgs e)
         {
             if (ViewModel.ranking is null)
                 OpenRanking();
@@ -114,7 +114,7 @@ namespace PopularityRanking.WPF
             MessageBox.Show(error, title, MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void matchupButton_Click(object sender, RoutedEventArgs e)
+        private void MatchupButton_Click(object sender, RoutedEventArgs e)
         {
             matchupButton.IsEnabled = false;
             matchupWindow = new MatchupWindow();
@@ -127,7 +127,7 @@ namespace PopularityRanking.WPF
             matchupWindow = null;
         }
 
-        private void addParticipantButton_Click(object sender, RoutedEventArgs e)
+        private void AddParticipantButton_Click(object sender, RoutedEventArgs e)
         {
             if ((!int.TryParse(idBox.Text, out int id)) || string.IsNullOrWhiteSpace(nameBox.Text))
             {
