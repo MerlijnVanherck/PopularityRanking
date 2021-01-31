@@ -89,12 +89,14 @@ namespace PopularityRanking.WPF
 
         private string PathName()
         {
-            var files = Directory.GetFiles(Directory.GetCurrentDirectory());
+            var directoryPath = Directory.GetCurrentDirectory() + "\\rankings";
+            if (!Directory.Exists(directoryPath))
+                Directory.CreateDirectory(directoryPath);
+
+            var files = Directory.GetFiles(directoryPath);
             var path = files.FirstOrDefault(f => f.EndsWith(rankingFileName.Text + ".xml"));
             if (string.IsNullOrWhiteSpace(path))
-            {
-                path = Directory.GetCurrentDirectory() + "\\rankings\\" + rankingFileName.Text + ".xml";
-            }
+                path = directoryPath + "\\" + rankingFileName.Text + ".xml";
 
             return path;
         }
