@@ -83,6 +83,7 @@ namespace PopularityRanking.WPF
 
         private void UpdateRankingGrid()
         {
+            ViewModel.ranking?.AssignScores();
             rankingGrid.ItemsSource = null;
             rankingGrid.ItemsSource = ViewModel.ranking?.Participants;
         }

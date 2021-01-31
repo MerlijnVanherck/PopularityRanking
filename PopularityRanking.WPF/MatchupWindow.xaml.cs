@@ -26,8 +26,9 @@ namespace PopularityRanking.WPF
         }
         public void UpdateComboBoxes()
         {
+            var list = ViewModel.ranking.Participants.OrderBy(p => p.Id);
             foreach (ComboBox c in matchupPanel.Children)
-                c.ItemsSource = ViewModel.ranking.Participants.OrderBy(p => p.Id);
+                c.ItemsSource = list;
         }
 
         private void participantSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -68,11 +69,15 @@ namespace PopularityRanking.WPF
 
         private void Participant_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ProcessMatchupButton.IsEnabled = true;
+            ProcessMatchupButton.IsEnabled = false;
 
+            var selections = new List<int>();
             foreach (ComboBox c in matchupPanel.Children)
-                if (c.SelectedIndex == -1)
-                    ProcessMatchupButton.IsEnabled = false;
+                selections.Add(c.SelectedIndex);
+
+            if (selections.Distinct().Count() == selections.Count
+                && !selections.Contains(-1))
+                ProcessMatchupButton.IsEnabled = true;
         }
 
         private void ProcessMatchupButton_Click(object sender, RoutedEventArgs e)
@@ -83,6 +88,7 @@ namespace PopularityRanking.WPF
                 matchup.Add((Participant)c.SelectedValue);
 
             Matchup.RunAnyPlayersMatchup(matchup.ToArray());
+            ViewModel.ranking.AssignScores();
 
             foreach (ComboBox c in matchupPanel.Children)
                 c.SelectedIndex = -1;
