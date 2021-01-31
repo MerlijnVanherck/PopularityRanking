@@ -24,6 +24,8 @@ namespace PopularityRanking
         internal Gaussian popularityGaussian = Gaussian.FromMeanAndVariance(
             DefaultMean, DefaultDeviation * DefaultDeviation);
 
+        public int? Score { get; set; } = null;
+
         public XmlSchema GetSchema()
         {
             return null;
@@ -54,7 +56,7 @@ namespace PopularityRanking
 
         public override string ToString()
         {
-            return $"#{Id} {Name} ({Popularity})";
+            return $"#{Id} {Name} ({Popularity})" + (Score != null ? $" ({Score})":"");
         }
     }
 }

@@ -1,10 +1,13 @@
-﻿using Microsoft.ML.Probabilistic.Models;
+﻿using Microsoft.ML.Probabilistic.Distributions;
+using Microsoft.ML.Probabilistic.Models;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Range = Microsoft.ML.Probabilistic.Models.Range;
 
 namespace PopularityRanking
 {
@@ -35,6 +38,36 @@ namespace PopularityRanking
             }
 
             return list.ToArray();
+        }
+
+        public void AssignScores(int min, int max)
+        {
+            var distribution = Variable.Poisson((max - min) / 2.0);
+            var range = new Range(max - min);
+            var odds = Variable.Array<bool>(range);
+
+            using (var index = Variable.ForEach(range))
+            {
+                odds[range].SetTo(distribution <= index.Index);
+            }
+
+            var cumFrequencyList = Engine.Infer<Bernoulli[]>(odds).Select(b => (int)Math.Round(b.GetProbTrue() * Participants.Count));
+
+            var participantsByPopularity = Participants.OrderBy(p => p.Popularity);
+            var participantEnumerator = participantsByPopularity.GetEnumerator();
+
+            int score = min;
+            int totalCount = 0;
+            foreach (var i in cumFrequencyList)
+            {
+                for (; totalCount < i; totalCount++)
+                {
+                    participantEnumerator.MoveNext();
+                    participantEnumerator.Current.Score = score;
+                }
+
+                score++;
+            }     
         }
 
         public XmlSchema GetSchema()
