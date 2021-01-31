@@ -7,11 +7,14 @@
         mc:Ignorable="d"
         Title="Matchup" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <StackPanel Margin="20">
-        <Slider Name="participantSlider" Minimum="2" Maximum="10" ValueChanged="participantSlider_ValueChanged" Value="3" MinWidth="250"/>
-        <Border DockPanel.Dock="Top" Margin="0 20" BorderThickness="1" BorderBrush="Gray"/>
+        <Slider Name="participantSlider" Minimum="2" Maximum="10" ValueChanged="ParticipantSlider_ValueChanged" Value="3" MinWidth="250" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="TopLeft"/>
+        <Border Margin="0 20" BorderThickness="1" BorderBrush="Gray"/>
         <Label>Select matchup participants in order (top: winner, bottom: loser) </Label>
         <StackPanel Name="matchupPanel">
         </StackPanel>
-        <Button HorizontalAlignment="Right" Height="25" IsEnabled="False" Margin="0 20 0 0" Name="ProcessMatchupButton" Click="ProcessMatchupButton_Click">Process matchup</Button>
+        <DockPanel LastChildFill="False">
+            <Button DockPanel.Dock="Left" Height="25" Margin="0 20 0 0" Name="RandomizeButton" Click="RandomizeButton_Click">Randomize</Button>
+            <Button DockPanel.Dock="Right" Height="25" IsEnabled="False" Margin="0 20 0 0" Name="ProcessMatchupButton" Click="ProcessMatchupButton_Click">Confirm matchup</Button>
+        </DockPanel>
     </StackPanel>
 </Window>

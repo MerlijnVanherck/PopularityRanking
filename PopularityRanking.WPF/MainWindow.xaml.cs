@@ -81,7 +81,7 @@ namespace PopularityRanking.WPF
             }
         }
 
-        private void UpdateRankingGrid()
+        public void UpdateRankingGrid()
         {
             ViewModel.ranking?.AssignScores();
             rankingGrid.ItemsSource = null;
@@ -118,7 +118,7 @@ namespace PopularityRanking.WPF
         private void MatchupButton_Click(object sender, RoutedEventArgs e)
         {
             matchupButton.IsEnabled = false;
-            matchupWindow = new MatchupWindow();
+            matchupWindow = new MatchupWindow(this);
             matchupWindow.Closing += MatchupWindow_Closing;
             matchupWindow.Show();
         }
