@@ -43,7 +43,7 @@ namespace PopularityRanking
         public void AssignScores(int min = 0, int max = 10)
         {
             var distribution = Variable.Poisson((max - min) / 2.0);
-            var range = new Range(max - min);
+            var range = new Range(max - min + 1);
             var odds = Variable.Array<bool>(range);
 
             using (var index = Variable.ForEach(range))
