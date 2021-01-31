@@ -40,7 +40,7 @@ namespace PopularityRanking
             return list.ToArray();
         }
 
-        public void AssignScores(int min, int max)
+        public void AssignScores(int min = 0, int max = 10)
         {
             var distribution = Variable.Poisson((max - min) / 2.0);
             var range = new Range(max - min);
