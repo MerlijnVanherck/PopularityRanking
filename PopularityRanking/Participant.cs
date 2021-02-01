@@ -58,7 +58,7 @@ namespace PopularityRanking
 
         public override string ToString()
         {
-            return $"#{Id} {Name} ({Popularity})" + (Score != null ? $" ({Score})":"");
+            return $"#{Id} {Name}";
         }
     }
 }
