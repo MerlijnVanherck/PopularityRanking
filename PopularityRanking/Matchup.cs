@@ -28,22 +28,24 @@ namespace PopularityRanking
             loser.popularityGaussian = loserPost;
         }
 
-        public static void RunAnyPlayersMatchup(Participant[] participants)
+        public static void RunAnyPlayersMatchup(Participant[] participants, double dynamicPopularityFactor = 3.0)
         {
             var range = new Range(participants.Length);
-            var results = Variable.Array<bool>(range); // DoNotInfer() ?
+            var results = Variable.Array<bool>(range);
             var popularities = Variable.Array<double>(range);
-            var means = Variable.Array<double>(range);
             var variances = Variable.Array<double>(range);
-            means.ObservedValue = participants.Select(
-                p => p.popularityGaussian.GetMean()).ToArray();
+            var priors = Variable.Array<Gaussian>(range);
+
+            priors.ObservedValue = participants.Select(
+                p => p.popularityGaussian).ToArray();
             variances.ObservedValue = participants.Select(
-                p => p.popularityGaussian.GetVariance()).ToArray();
+                p => dynamicPopularityFactor * dynamicPopularityFactor).ToArray();
 
             using (var loop = Variable.ForEach(range))
             {
                 popularities[range] = Variable.GaussianFromMeanAndVariance(
-                    means[range], variances[range]);
+                    Variable<double>.Random(priors[range]),
+                    variances[range]);
 
                 using (Variable.If(loop.Index > 0))
                 {
