@@ -18,7 +18,9 @@ namespace PopularityRanking.WPF
     /// </summary>
     public partial class MatchupWindow : Window
     {
-        private MainWindow mainWindow;
+        private readonly MainWindow mainWindow;
+        private bool isRankedMode = true;
+
         public MatchupWindow(MainWindow window)
         {
             mainWindow = window;
@@ -30,7 +32,7 @@ namespace PopularityRanking.WPF
         {
             var list = ViewModel.ranking.Participants.OrderBy(p => p.Id);
             foreach (Grid g in matchupPanel.Children)
-                ((ComboBox)g.Children[2]).ItemsSource = list;
+                ((ComboBox)g.Children[^1]).ItemsSource = list;
         }
 
         public void ChooseRandomParticipants()
@@ -47,7 +49,7 @@ namespace PopularityRanking.WPF
             }
 
             for (int i = 0; i < number; i++)
-                ((ComboBox)((Grid)(matchupPanel.Children[i])).Children[2]).SelectedIndex = list[i];
+                ((ComboBox)((Grid)(matchupPanel.Children[i])).Children[^1]).SelectedIndex = list[i];
         }
 
         private void ParticipantSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -90,6 +92,70 @@ namespace PopularityRanking.WPF
             Grid.SetRow(comboBox, 0);
             Grid.SetRowSpan(comboBox, 2);
 
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(isRankedMode ? 30 : 50)
+            });
+            grid.ColumnDefinitions.Add(new ColumnDefinition());
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(15) });
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(15) });
+
+            if (isRankedMode)
+            {
+                CreateUpArrow(grid);
+                CreateDownArrow(grid);
+            }
+            else
+                CreateScoreBox(grid);
+            
+            grid.Children.Add(comboBox);
+
+            return grid;
+        }
+
+        private void CreateScoreBox(Grid grid)
+        {
+            var textBox = new TextBox
+            {
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 2, 0),
+                Padding = new Thickness(0),
+                Height = 24
+            };
+
+            textBox.TextChanged += this.ScoreBox_TextChanged;
+
+            Grid.SetColumn(textBox, 0);
+            Grid.SetRow(textBox, 0);
+            Grid.SetRowSpan(textBox, 2);
+
+            grid.Children.Add(textBox);
+        }
+
+        private void ScoreBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ProcessMatchupButton.IsEnabled = VerifyTextBoxes() && VerifySelectionBoxes();
+        }
+
+        private bool VerifyTextBoxes()
+        {
+            if (isRankedMode)
+                return true;
+
+            var textList = new List<string>();
+            foreach (Grid c in matchupPanel.Children)
+                textList.Add(((TextBox)c.Children[0]).Text);
+
+            foreach (var t in textList)
+                if (!int.TryParse(t, out _))
+                    return false;
+
+            return true;
+        }
+
+        private void CreateUpArrow(Grid grid)
+        {
             var upArrow = new Button
             {
                 Content = "▲",
@@ -107,6 +173,11 @@ namespace PopularityRanking.WPF
             Grid.SetColumn(upArrow, 0);
             Grid.SetRow(upArrow, 0);
 
+            grid.Children.Add(upArrow);
+        }
+
+        private void CreateDownArrow(Grid grid)
+        {
             var downArrow = new Button
             {
                 Content = "▼",
@@ -124,17 +195,7 @@ namespace PopularityRanking.WPF
             Grid.SetColumn(downArrow, 0);
             Grid.SetRow(downArrow, 1);
 
-            var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(30) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition());
-            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(15) });
-            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(15) });
-
-            grid.Children.Add(upArrow);
             grid.Children.Add(downArrow);
-            grid.Children.Add(comboBox);
-
-            return grid;
         }
 
         private void DownArrow_Click(object sender, RoutedEventArgs e)
@@ -167,34 +228,94 @@ namespace PopularityRanking.WPF
 
         private void Participant_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ProcessMatchupButton.IsEnabled = false;
+            ProcessMatchupButton.IsEnabled = VerifySelectionBoxes()
+                && VerifyTextBoxes();
+        }
 
+        private bool VerifySelectionBoxes()
+        {
             var selections = new List<int>();
             foreach (Grid c in matchupPanel.Children)
-                selections.Add(((ComboBox)c.Children[2]).SelectedIndex);
+                selections.Add(((ComboBox)c.Children[^1]).SelectedIndex);
 
             if (selections.Distinct().Count() == selections.Count
                 && !selections.Contains(-1))
-                ProcessMatchupButton.IsEnabled = true;
+                return true;
+
+            return false;
         }
 
         private void ProcessMatchupButton_Click(object sender, RoutedEventArgs e)
         {
-            var matchup = new List<Participant>();
+            if (isRankedMode)
+                RunMatchupOrder();
+            else
+                RunMatchupScored();
 
-            foreach (Grid c in matchupPanel.Children)
-                matchup.Add((Participant)((ComboBox)c.Children[2]).SelectedValue);
-
-            Matchup.RunAnyPlayersMatchup(matchup.ToArray());
             ViewModel.ranking.AssignScores();
             mainWindow.UpdateRankingGrid();
 
             ChooseRandomParticipants();
         }
 
+        private void RunMatchupOrder()
+        {
+            var matchup = new List<Participant>();
+
+            foreach (Grid c in matchupPanel.Children)
+                matchup.Add(((Participant)((ComboBox)c.Children[^1]).SelectedValue));
+
+            ViewModel.ranking.RunAnyPlayersMatchup(matchup.ToArray());
+        }
+
+        private void RunMatchupScored()
+        {
+            var matchup = new List<(Participant, int)>();
+
+            foreach (Grid c in matchupPanel.Children)
+                matchup.Add(((Participant)((ComboBox)c.Children[^1]).SelectedValue,
+                    int.Parse(((TextBox)c.Children[0]).Text)));
+
+            matchup = matchup.OrderByDescending(p => p.Item2).ToList();
+
+            ViewModel.ranking.RunAnyPlayersMatchupScored(
+                matchup.Select(p => p.Item1).ToArray(),
+                matchup.Select(p => p.Item2).ToArray());
+        }
+
         private void RandomizeButton_Click(object sender, RoutedEventArgs e)
         {
             ChooseRandomParticipants();
+        }
+
+        private void ScoredRankedToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (isRankedMode)
+                SetScoredMode((Button) sender);
+            else
+                SetRankedMode((Button)sender);
+        }
+
+        private void SetRankedMode(Button b)
+        {
+            isRankedMode = true;
+            WinnerLabel.Visibility = Visibility.Visible;
+            LoserLabel.Visibility = Visibility.Visible;
+            b.Content = "Score mode";
+            var participantNumber = (int)participantSlider.Value;
+            DecreaseParticipants(participantNumber);
+            IncreaseParticipants(participantNumber);
+        }
+
+        private void SetScoredMode(Button b)
+        {
+            isRankedMode = false;
+            WinnerLabel.Visibility = Visibility.Hidden;
+            LoserLabel.Visibility = Visibility.Hidden;
+            b.Content = "Ranked mode";
+            var participantNumber = (int)participantSlider.Value;
+            DecreaseParticipants(participantNumber);
+            IncreaseParticipants(participantNumber);
         }
     }
 }
