@@ -6,6 +6,11 @@
         xmlns:local="clr-namespace:PopularityRanking.WPF"
         mc:Ignorable="d"
         Title="Ranking" SizeToContent="WidthAndHeight" MinWidth="650" MinHeight="300">
+    <Window.Resources>
+        <Style x:Key="DoubleCell" TargetType="DataGridCell">
+            <Setter Property="TextBlock.TextAlignment" Value="Right"/>
+        </Style>
+    </Window.Resources>
     <DockPanel Margin="20" LastChildFill="True">
         <DockPanel DockPanel.Dock="Top" LastChildFill="False">
             <Label>Ranking name:</Label>
@@ -21,7 +26,14 @@
             <TextBox DockPanel.Dock="Left" VerticalContentAlignment="Center" Margin="20 0" Height="25" Width="200" Name="nameBox"></TextBox>
             <Button DockPanel.Dock="Right" Height="25" IsEnabled="False" Name="addParticipantButton" Click="AddParticipantButton_Click">Add participant</Button>
         </DockPanel>
-        <DataGrid MinHeight="100" Name="rankingGrid" ItemsSource="{Binding Participants}" AutoGenerateColumns="True" CanUserAddRows="False">
+        <DataGrid MinHeight="100" Name="rankingGrid" ItemsSource="{Binding Participants}" CanUserAddRows="False" AutoGenerateColumns="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Id}" Header="Id" CellStyle="{StaticResource DoubleCell}"/>
+                <DataGridTextColumn Binding="{Binding Name}" Header="Name"/>
+                <DataGridTextColumn Binding="{Binding Popularity, StringFormat={}{0:n2}}" Header="Popularity" CellStyle="{StaticResource DoubleCell}"/>
+                <DataGridTextColumn Binding="{Binding Uncertainty, StringFormat={}{0:n2}}" Header="Uncertainty" CellStyle="{StaticResource DoubleCell}"/>
+                <DataGridTextColumn Binding="{Binding Score}" Header="Score" CellStyle="{StaticResource DoubleCell}"/>
+            </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
 </Window>
