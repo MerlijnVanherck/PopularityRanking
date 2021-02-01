@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PopularityRanking.WPF"
         mc:Ignorable="d"
-        Title="Matchup" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
+        Title="Matchup" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" MaxHeight="1000">
     <StackPanel Margin="20">
         <Slider Name="participantSlider" Minimum="2" Maximum="10" ValueChanged="ParticipantSlider_ValueChanged" Value="3" MinWidth="250" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="TopLeft"/>
         <Border Margin="0 20" BorderThickness="1" BorderBrush="Gray"/>

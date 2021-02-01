@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PopularityRanking.WPF"
         mc:Ignorable="d"
-        Title="Ranking" SizeToContent="WidthAndHeight" MinWidth="650" MinHeight="300">
+        Title="Ranking" SizeToContent="WidthAndHeight" MinWidth="650" MinHeight="300" MaxHeight="1000">
     <Window.Resources>
         <Style x:Key="DoubleCell" TargetType="DataGridCell">
             <Setter Property="TextBlock.TextAlignment" Value="Right"/>
