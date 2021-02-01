@@ -15,7 +15,7 @@ namespace PopularityRanking
     [XmlRoot(ElementName = "ranking")]
     public class Ranking : IXmlSerializable
     {
-        public static readonly InferenceEngine Engine = new InferenceEngine();
+        public static readonly InferenceEngine Engine = new InferenceEngine(new ExpectationPropagation());
 
         public List<Participant> Participants { get; set; } = new List<Participant>();
 
