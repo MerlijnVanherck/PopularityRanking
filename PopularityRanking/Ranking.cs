@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Range = Microsoft.ML.Probabilistic.Models.Range;
+using Microsoft.ML.Probabilistic.Algorithms;
 
 namespace PopularityRanking
 {
@@ -40,34 +41,26 @@ namespace PopularityRanking
             return list.ToArray();
         }
 
-        public void AssignScores(int min = 0, int max = 10)
+        public void AssignScores(int minScore = 0, int maxScore = 10)
         {
-            var distribution = Variable.Poisson((max - min) / 2.0);
-            var range = new Range(max - min + 1);
-            var odds = Variable.Array<bool>(range);
+            var minPopularity = Participants.Min(p => p.Popularity);
+            var maxPopularity = Participants.Max(p => p.Popularity);
+            var stepPopularity = (maxPopularity - minPopularity) / (maxScore - minScore + 1);
 
-            using (var index = Variable.ForEach(range))
-            {
-                odds[range].SetTo(distribution <= index.Index);
-            }
+            foreach (var p in Participants)
+                p.Score = minScore + FindIntervalContainingNumber(
+                    minPopularity, maxPopularity, stepPopularity, p.Popularity);
+        }
 
-            var cumFrequencyList = Engine.Infer<Bernoulli[]>(odds).Select(b => (int)Math.Round(b.GetProbTrue() * Participants.Count));
+        private int FindIntervalContainingNumber(
+            double rangeStart, double rangeEnd, double rangeStep, double number)
+        {
+            if (number < rangeStart || number > rangeEnd)
+                return -1;
 
-            var participantsByPopularity = Participants.OrderBy(p => p.Popularity);
-            var participantEnumerator = participantsByPopularity.GetEnumerator();
-
-            int score = min;
-            int totalCount = 0;
-            foreach (var i in cumFrequencyList)
-            {
-                for (; totalCount < i; totalCount++)
-                {
-                    participantEnumerator.MoveNext();
-                    participantEnumerator.Current.Score = score;
-                }
-
-                score++;
-            }     
+            for (int i = 1; ; i++)
+                if (number <= rangeStart + i * rangeStep)
+                    return i - 1;
         }
 
         public XmlSchema GetSchema()
