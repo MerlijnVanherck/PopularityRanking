@@ -21,6 +21,8 @@ namespace PopularityRanking
         public double Popularity { get =>
                 popularityGaussian.GetMean() - Math.Sqrt(popularityGaussian.GetVariance()); }
 
+        public double Precision { get => popularityGaussian.Precision; }
+
         internal Gaussian popularityGaussian = Gaussian.FromMeanAndVariance(
             DefaultMean, DefaultDeviation * DefaultDeviation);
 
