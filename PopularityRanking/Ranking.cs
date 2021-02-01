@@ -41,7 +41,7 @@ namespace PopularityRanking
             return list.ToArray();
         }
 
-        public void AssignScores(int minScore = 0, int maxScore = 10)
+        public void AssignScores(int minScore = 1, int maxScore = 10)
         {
             var minPopularity = Participants.Min(p => p.Popularity);
             var maxPopularity = Participants.Max(p => p.Popularity);
