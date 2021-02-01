@@ -18,6 +18,8 @@ namespace PopularityRanking
         public static readonly InferenceEngine Engine = new InferenceEngine(new ExpectationPropagation());
 
         public List<Participant> Participants { get; set; } = new List<Participant>();
+        public double DynamicPopularityFactor { get; set; } = 3.0;
+        public Gaussian DrawMargin { get; set; } = Gaussian.FromMeanAndVariance(10, 10);
 
         public Participant[] RandomMatchup(int number)
         {
@@ -62,6 +64,89 @@ namespace PopularityRanking
                 if (number <= rangeStart + i * rangeStep)
                     return i - 1;
         }
+        public void RunAnyPlayersMatchup(Participant[] participants)
+        {
+            var range = new Range(participants.Length);
+            var results = Variable.Array<bool>(range);
+            var popularities = Variable.Array<double>(range);
+            var variances = Variable.Array<double>(range);
+            var priors = Variable.Array<Gaussian>(range);
+
+            priors.ObservedValue = participants.Select(
+                p => p.popularityGaussian).ToArray();
+            variances.ObservedValue = participants.Select(
+                p => DynamicPopularityFactor * DynamicPopularityFactor).ToArray();
+
+            using (var loop = Variable.ForEach(range))
+            {
+                popularities[range] = Variable.GaussianFromMeanAndVariance(
+                    Variable<double>.Random(priors[range]),
+                    variances[range]);
+
+                using (Variable.If(loop.Index > 0))
+                {
+                    results[loop.Index]
+                        .SetTo(popularities[loop.Index - 1] > popularities[loop.Index]);
+                    results.ObservedValue = participants.Select(p => true).ToArray();
+                }
+            }
+
+            var participantPosts = Ranking.Engine.Infer<Gaussian[]>(popularities);
+
+            for (int i = 0; i < participants.Length; i++)
+                participants[i].popularityGaussian = participantPosts[i];
+        }
+
+        public void RunAnyPlayersMatchupScored(Participant[] participants, int[] orderedScores)
+        {
+            var range = new Range(participants.Length);
+            var results = Variable.Array<bool>(range);
+            var popularities = Variable.Array<double>(range);
+            var variances = Variable.Array<double>(range);
+            var priors = Variable.Array<Gaussian>(range);
+            var scores = Variable.Array<double>(range);
+            var drawMargin = Variable.GaussianFromMeanAndVariance(
+                DrawMargin.GetMean(),
+                Math.Sqrt(DrawMargin.GetVariance()));
+            scores.ObservedValue = orderedScores.Select(i => (double)i).ToArray();
+
+            priors.ObservedValue = participants.Select(
+                p => p.popularityGaussian).ToArray();
+            variances.ObservedValue = participants.Select(
+                p => DynamicPopularityFactor * DynamicPopularityFactor).ToArray();
+
+            using (var loop = Variable.ForEach(range))
+            {
+                popularities[range] = Variable.GaussianFromMeanAndVariance(
+                    Variable<double>.Random(priors[range]),
+                    variances[range]);
+
+                using (Variable.If(loop.Index > 0))
+                {
+                    using (Variable.If(scores[loop.Index] == scores[loop.Index - 1]))
+                    {
+                        Variable<bool>.ConstrainBetween(
+                            popularities[loop.Index - 1] - popularities[loop.Index],
+                            -drawMargin,
+                            drawMargin);
+                    }
+
+                    using (Variable.If(scores[loop.Index] != scores[loop.Index - 1]))
+                    {
+                        results[loop.Index].SetTo(popularities[loop.Index - 1] >
+                            popularities[loop.Index] / (scores[loop.Index] / scores[loop.Index - 1]));
+
+                        results.ObservedValue = participants.Select(p => true).ToArray();
+                    }
+                }
+            }
+
+            var participantPosts = Ranking.Engine.Infer<Gaussian[]>(popularities);
+            DrawMargin = Ranking.Engine.Infer<Gaussian>(drawMargin);
+
+            for (int i = 0; i < participants.Length; i++)
+                participants[i].popularityGaussian = participantPosts[i];
+        }
 
         public XmlSchema GetSchema()
         {
@@ -70,6 +155,12 @@ namespace PopularityRanking
 
         public void ReadXml(XmlReader reader)
         {
+            reader.MoveToFirstAttribute();
+            DynamicPopularityFactor = double.Parse(reader.GetAttribute("dynamic"));
+            DrawMargin = Gaussian.FromMeanAndVariance(
+                double.Parse(reader.GetAttribute("drawMean")),
+                double.Parse(reader.GetAttribute("drawVariance")));
+
             while (reader.ReadToFollowing("participant"))
             {
                 var p = new Participant();
@@ -80,6 +171,10 @@ namespace PopularityRanking
 
         public void WriteXml(XmlWriter writer)
         {
+            writer.WriteAttributeString("dynamic", DynamicPopularityFactor.ToString());
+            writer.WriteAttributeString("drawMean", DrawMargin.GetMean().ToString());
+            writer.WriteAttributeString("drawVariance", DrawMargin.GetVariance().ToString());
+
             foreach (var p in Participants)
             {
                 writer.WriteStartElement("participant");
