@@ -107,7 +107,7 @@ namespace PopularityRanking
             var scores = Variable.Array<double>(range);
             var drawMargin = Variable.GaussianFromMeanAndVariance(
                 DrawMargin.GetMean(),
-                Math.Sqrt(DrawMargin.GetVariance()));
+                DrawMargin.GetVariance());
             scores.ObservedValue = orderedScores.Select(i => (double)i).ToArray();
 
             priors.ObservedValue = participants.Select(
