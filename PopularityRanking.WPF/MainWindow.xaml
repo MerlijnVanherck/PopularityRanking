@@ -28,11 +28,11 @@
         </DockPanel>
         <DataGrid MinHeight="100" Name="rankingGrid" ItemsSource="{Binding Participants}" CanUserAddRows="False" AutoGenerateColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Id}" Header="Id" CellStyle="{StaticResource DoubleCell}"/>
+                <DataGridTextColumn Binding="{Binding Id}" Header="Id" IsReadOnly="True" CellStyle="{StaticResource DoubleCell}"/>
                 <DataGridTextColumn Binding="{Binding Name}" Header="Name"/>
-                <DataGridTextColumn Binding="{Binding Popularity, StringFormat={}{0:n2}}" Header="Popularity" CellStyle="{StaticResource DoubleCell}"/>
-                <DataGridTextColumn Binding="{Binding Uncertainty, StringFormat={}{0:n2}}" Header="Uncertainty" CellStyle="{StaticResource DoubleCell}"/>
-                <DataGridTextColumn Binding="{Binding Score}" Header="Score" CellStyle="{StaticResource DoubleCell}"/>
+                <DataGridTextColumn Binding="{Binding Popularity, StringFormat={}{0:n2}}" Header="Popularity" IsReadOnly="True" CellStyle="{StaticResource DoubleCell}"/>
+                <DataGridTextColumn Binding="{Binding Uncertainty, StringFormat={}{0:n2}}" Header="Uncertainty" IsReadOnly="True" CellStyle="{StaticResource DoubleCell}"/>
+                <DataGridTextColumn Binding="{Binding Score}" Header="Score" IsReadOnly="True" CellStyle="{StaticResource DoubleCell}"/>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
