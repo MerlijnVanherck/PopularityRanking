@@ -30,7 +30,7 @@ namespace PopularityRanking.WPF
         }
         public void UpdateComboBoxes()
         {
-            var list = ViewModel.ranking.Participants.OrderBy(p => p.Id);
+            var list = ViewModel.ranking.Participants.Values.OrderBy(p => p.Id);
             foreach (Grid g in matchupPanel.Children)
                 ((ComboBox)g.Children[^1]).ItemsSource = list;
         }
@@ -81,7 +81,7 @@ namespace PopularityRanking.WPF
         {
             var comboBox = new ComboBox
             {
-                ItemsSource = ViewModel.ranking.Participants.OrderBy(p => p.Id),
+                ItemsSource = ViewModel.ranking.Participants.Values.OrderBy(p => p.Id),
                 Margin = new Thickness(0, 3, 0, 3),
                 VerticalAlignment = VerticalAlignment.Stretch
             };

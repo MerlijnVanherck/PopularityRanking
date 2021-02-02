@@ -17,7 +17,7 @@ namespace PopularityRanking
     {
         public static readonly InferenceEngine Engine = new InferenceEngine(new ExpectationPropagation());
 
-        public List<Participant> Participants { get; set; } = new List<Participant>();
+        public Dictionary<int, Participant> Participants { get; set; } = new Dictionary<int, Participant>();
         public double DynamicPopularityFactor { get; set; } = 3.0;
         public Gaussian DrawMargin { get; set; } = Gaussian.FromMeanAndVariance(10, 10);
 
@@ -45,13 +45,13 @@ namespace PopularityRanking
 
         public void AssignScores(int minScore = 1, int maxScore = 10)
         {
-            var minPopularity = Participants.Min(p => p.Popularity);
-            var maxPopularity = Participants.Max(p => p.Popularity);
+            var minPopularity = Participants.Min(p => p.Value.Popularity);
+            var maxPopularity = Participants.Max(p => p.Value.Popularity);
             var stepPopularity = (maxPopularity - minPopularity) / (maxScore - minScore + 1);
 
             foreach (var p in Participants)
-                p.Score = minScore + FindIntervalContainingNumber(
-                    minPopularity, maxPopularity, stepPopularity, p.Popularity);
+                p.Value.Score = minScore + FindIntervalContainingNumber(
+                    minPopularity, maxPopularity, stepPopularity, p.Value.Popularity);
         }
 
         private int FindIntervalContainingNumber(
@@ -165,7 +165,7 @@ namespace PopularityRanking
             {
                 var p = new Participant();
                 p.ReadXml(reader);
-                Participants.Add(p);
+                Participants.Add(p.Id, p);
             }
         }
 
@@ -178,7 +178,7 @@ namespace PopularityRanking
             foreach (var p in Participants)
             {
                 writer.WriteStartElement("participant");
-                p.WriteXml(writer);
+                p.Value.WriteXml(writer);
                 writer.WriteEndElement();
             }
         }

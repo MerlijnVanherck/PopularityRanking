@@ -14,7 +14,7 @@ namespace PopularityRanking
         public const double DefaultMean = 1000;
         public const double DefaultDeviation = 300;
 
-        public int Id { get; set; } = 0;
+        public int Id { get; private set; } = 0;
 
         public string Name { get; set; } = "placeholder";
 
@@ -27,6 +27,16 @@ namespace PopularityRanking
             DefaultMean, DefaultDeviation * DefaultDeviation);
 
         public int? Score { get; set; } = null;
+
+        public Participant(int id)
+        {
+            Id = id;
+        }
+
+        internal Participant()
+        {
+
+        }
 
         public XmlSchema GetSchema()
         {

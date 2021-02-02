@@ -85,7 +85,7 @@ namespace PopularityRanking.WPF
         {
             ViewModel.ranking?.AssignScores();
             rankingGrid.ItemsSource = null;
-            rankingGrid.ItemsSource = ViewModel.ranking?.Participants;
+            rankingGrid.ItemsSource = ViewModel.ranking?.Participants.Values;
         }
 
         private string PathName()
@@ -136,9 +136,8 @@ namespace PopularityRanking.WPF
                 return;
             }
 
-            ViewModel.ranking.Participants.Add(new Participant
+            ViewModel.ranking.Participants.Add(id, new Participant(id)
             {
-                Id = id,
                 Name = nameBox.Text
             });
 
