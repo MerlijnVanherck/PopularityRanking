@@ -9,6 +9,7 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using Range = Microsoft.ML.Probabilistic.Models.Range;
 using Microsoft.ML.Probabilistic.Algorithms;
+using Microsoft.ML.Probabilistic.Models.Attributes;
 
 namespace PopularityRanking
 {
@@ -19,7 +20,7 @@ namespace PopularityRanking
 
         public Dictionary<int, Participant> Participants { get; set; } = new Dictionary<int, Participant>();
         public double DynamicPopularityFactor { get; set; } = 3.0;
-        public Gaussian DrawMargin { get; set; } = Gaussian.FromMeanAndVariance(10, 10);
+        public Gaussian ScoreAccuracy { get; set; } = Gaussian.FromMeanAndVariance(10, 10);
 
         public Participant[] RandomMatchup(int number)
         {
@@ -29,7 +30,7 @@ namespace PopularityRanking
                 throw new ArgumentException("A matchup can't be larger than the total number of participants.");
             if (Participants.Count < 2)
                 throw new ArgumentException("Cannot create matchups from an insufficiently populated participant list.");
-            
+
             var list = new List<Participant>();
             var rand = new Random();
 
@@ -100,14 +101,13 @@ namespace PopularityRanking
         public void RunAnyPlayersMatchupScored(Participant[] participants, int[] orderedScores)
         {
             var range = new Range(participants.Length);
-            var results = Variable.Array<bool>(range);
             var popularities = Variable.Array<double>(range);
             var variances = Variable.Array<double>(range);
             var priors = Variable.Array<Gaussian>(range);
-            var scores = Variable.Array<double>(range);
-            var drawMargin = Variable.GaussianFromMeanAndVariance(
-                DrawMargin.GetMean(),
-                DrawMargin.GetVariance());
+            var scores = Variable.Array<double>(range).Attrib(new DoNotInfer());
+            var scoreMargin = Variable.GaussianFromMeanAndVariance(
+                ScoreAccuracy.GetMean(),
+                ScoreAccuracy.GetVariance());
             scores.ObservedValue = orderedScores.Select(i => (double)i).ToArray();
 
             priors.ObservedValue = participants.Select(
@@ -123,26 +123,16 @@ namespace PopularityRanking
 
                 using (Variable.If(loop.Index > 0))
                 {
-                    using (Variable.If(scores[loop.Index] == scores[loop.Index - 1]))
-                    {
-                        Variable<bool>.ConstrainBetween(
-                            popularities[loop.Index - 1] - popularities[loop.Index],
-                            -drawMargin,
-                            drawMargin);
-                    }
-
-                    using (Variable.If(scores[loop.Index] != scores[loop.Index - 1]))
-                    {
-                        results[loop.Index].SetTo(popularities[loop.Index - 1] >
-                            popularities[loop.Index] / (scores[loop.Index] / scores[loop.Index - 1]));
-
-                        results.ObservedValue = participants.Select(p => true).ToArray();
-                    }
+                    Variable<bool>.ConstrainBetween(
+                        popularities[loop.Index - 1] -
+                        (popularities[loop.Index] / (scores[loop.Index] / scores[loop.Index - 1])),
+                        -scoreMargin,
+                        scoreMargin);
                 }
             }
 
             var participantPosts = Ranking.Engine.Infer<Gaussian[]>(popularities);
-            DrawMargin = Ranking.Engine.Infer<Gaussian>(drawMargin);
+            ScoreAccuracy = Ranking.Engine.Infer<Gaussian>(scoreMargin);
 
             for (int i = 0; i < participants.Length; i++)
                 participants[i].popularityGaussian = participantPosts[i];
@@ -157,9 +147,9 @@ namespace PopularityRanking
         {
             reader.MoveToFirstAttribute();
             DynamicPopularityFactor = double.Parse(reader.GetAttribute("dynamic"));
-            DrawMargin = Gaussian.FromMeanAndVariance(
-                double.Parse(reader.GetAttribute("drawMean")),
-                double.Parse(reader.GetAttribute("drawVariance")));
+            ScoreAccuracy = Gaussian.FromMeanAndVariance(
+                double.Parse(reader.GetAttribute("scoreAccuracyMean")),
+                double.Parse(reader.GetAttribute("scoreAccuracyVariance")));
 
             while (reader.ReadToFollowing("participant"))
             {
@@ -172,8 +162,8 @@ namespace PopularityRanking
         public void WriteXml(XmlWriter writer)
         {
             writer.WriteAttributeString("dynamic", DynamicPopularityFactor.ToString());
-            writer.WriteAttributeString("drawMean", DrawMargin.GetMean().ToString());
-            writer.WriteAttributeString("drawVariance", DrawMargin.GetVariance().ToString());
+            writer.WriteAttributeString("scoreAccuracyMean", ScoreAccuracy.GetMean().ToString());
+            writer.WriteAttributeString("scoreAccuracyVariance", ScoreAccuracy.GetVariance().ToString());
 
             foreach (var p in Participants)
             {
