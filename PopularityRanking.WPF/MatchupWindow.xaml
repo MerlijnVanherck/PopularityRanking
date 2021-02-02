@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Matchup" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" MaxHeight="1000">
     <StackPanel Margin="20">
-        <Slider Name="participantSlider" Minimum="2" Maximum="10" ValueChanged="ParticipantSlider_ValueChanged" Value="3" MinWidth="250" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="TopLeft"/>
+        <Slider Name="participantSlider" Minimum="2" Maximum="20" ValueChanged="ParticipantSlider_ValueChanged" Value="3" MinWidth="250" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="TopLeft"/>
         <Border Margin="0 20" BorderThickness="1" BorderBrush="Gray"/>
         <DockPanel LastChildFill="False">
             <Label DockPanel.Dock="Left" Padding="3 0 0 5" VerticalAlignment="Bottom">Rank participants in order</Label>
