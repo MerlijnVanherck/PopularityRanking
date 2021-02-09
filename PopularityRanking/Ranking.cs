@@ -50,21 +50,23 @@ namespace PopularityRanking
             var maxPopularity = Participants.Max(p => p.Value.Popularity);
             var stepPopularity = (maxPopularity - minPopularity) / (maxScore - minScore + 1);
 
+            var intervalList = new List<double>();
+            for (int i = 1; i < maxScore - minScore; i++)
+                intervalList.Add(minPopularity + i * stepPopularity);
+
             foreach (var p in Participants)
-                p.Value.Score = minScore + FindIntervalContainingNumber(
-                    minPopularity, maxPopularity, stepPopularity, p.Value.Popularity);
+                p.Value.Score = minScore + FindIntervalContainingNumber(intervalList, p.Value.Popularity);
         }
 
-        private int FindIntervalContainingNumber(
-            double rangeStart, double rangeEnd, double rangeStep, double number)
+        private int FindIntervalContainingNumber(List<double> intervalList, double number)
         {
-            if (number < rangeStart || number > rangeEnd)
-                return -1;
+            for (int i = 0; i < intervalList.Count; i++)
+                if (number <= intervalList[i])
+                    return i;
 
-            for (int i = 1; ; i++)
-                if (number <= rangeStart + i * rangeStep)
-                    return i - 1;
+            return intervalList.Count - 1;
         }
+
         public void RunAnyPlayersMatchup(Participant[] participants)
         {
             var range = new Range(participants.Length);
