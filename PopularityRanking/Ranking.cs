@@ -51,8 +51,8 @@ namespace PopularityRanking
             var stepPopularity = (maxPopularity - minPopularity) / (maxScore - minScore + 1);
 
             var intervalList = new List<double>();
-            for (int i = 1; i < maxScore - minScore; i++)
-                intervalList.Add(minPopularity + i * stepPopularity);
+            for (int i = 0; i <= maxScore - minScore; i++)
+                intervalList.Add(minPopularity + (i + 1) * stepPopularity);
 
             foreach (var p in Participants)
                 p.Value.Score = minScore + FindIntervalContainingNumber(intervalList, p.Value.Popularity);
