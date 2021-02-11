@@ -110,7 +110,7 @@ namespace PopularityRanking
             var scoreMargin = Variable.GaussianFromMeanAndVariance(
                 ScoreAccuracy.GetMean(),
                 ScoreAccuracy.GetVariance());
-            scores.ObservedValue = orderedScores.Select(i => (double)i).ToArray();
+            scores.ObservedValue = orderedScores.Select(i => Math.Log(i)).ToArray();
 
             priors.ObservedValue = participants.Select(
                 p => p.popularityGaussian).ToArray();
