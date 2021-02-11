@@ -293,7 +293,7 @@ namespace PopularityRanking.WPF
             if (isRankedMode)
                 SetScoredMode((Button) sender);
             else
-                SetRankedMode((Button)sender);
+                SetRankedMode((Button) sender);
         }
 
         private void SetRankedMode(Button b)
@@ -301,6 +301,7 @@ namespace PopularityRanking.WPF
             isRankedMode = true;
             WinnerLabel.Visibility = Visibility.Visible;
             LoserLabel.Visibility = Visibility.Visible;
+            InstructionsLabel.Content = "Rank participants in order";
             b.Content = "Score mode";
             var participantNumber = (int)participantSlider.Value;
             DecreaseParticipants(participantNumber);
@@ -312,6 +313,7 @@ namespace PopularityRanking.WPF
             isRankedMode = false;
             WinnerLabel.Visibility = Visibility.Hidden;
             LoserLabel.Visibility = Visibility.Hidden;
+            InstructionsLabel.Content = "Assign each participant a score";
             b.Content = "Ranked mode";
             var participantNumber = (int)participantSlider.Value;
             DecreaseParticipants(participantNumber);

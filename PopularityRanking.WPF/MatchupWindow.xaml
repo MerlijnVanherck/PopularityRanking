@@ -10,7 +10,7 @@
         <Slider Name="participantSlider" Minimum="2" Maximum="20" ValueChanged="ParticipantSlider_ValueChanged" Value="3" MinWidth="250" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="TopLeft"/>
         <Border Margin="0 20" BorderThickness="1" BorderBrush="Gray"/>
         <DockPanel LastChildFill="False">
-            <Label DockPanel.Dock="Left" Padding="3 0 0 5" VerticalAlignment="Bottom">Rank participants in order</Label>
+            <Label DockPanel.Dock="Left" Padding="3 0 0 5" VerticalAlignment="Bottom" Name="InstructionsLabel">Rank participants in order</Label>
             <Button DockPanel.Dock="Right" Height="25" Click="ScoredRankedToggle_Click">Scored Matchup</Button>
         </DockPanel>
         <Label Name="WinnerLabel" FontSize="10" Padding="3 0">Winner</Label>
