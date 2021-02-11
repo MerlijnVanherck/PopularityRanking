@@ -8,8 +8,7 @@
         Title="Matchup" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize" MaxHeight="1000">
     <StackPanel Margin="20">
         <Slider Name="participantSlider" Minimum="2" Maximum="20" ValueChanged="ParticipantSlider_ValueChanged" Value="3" MinWidth="250" TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="TopLeft"/>
-        <Border Margin="0 20" BorderThickness="1" BorderBrush="Gray"/>
-        <DockPanel LastChildFill="False">
+        <DockPanel LastChildFill="False" Margin="0 20 0 0">
             <Label DockPanel.Dock="Left" Padding="3 0 0 5" VerticalAlignment="Bottom" Name="InstructionsLabel">Rank participants in order</Label>
             <Button DockPanel.Dock="Right" Height="25" Click="ScoredRankedToggle_Click">Scored Matchup</Button>
         </DockPanel>

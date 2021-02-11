@@ -12,13 +12,12 @@
         </Style>
     </Window.Resources>
     <DockPanel Margin="20" LastChildFill="True">
-        <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+        <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="0 0 0 20">
             <Label>Ranking name:</Label>
             <TextBox VerticalContentAlignment="Center" x:Name="rankingFileName" Width="250" Margin="20 0" TextChanged="rankingName_TextChanged"></TextBox>
             <Button x:Name="rankingFileButton" Height="25" Click="FileButton_Click" IsEnabled="False">Open ranking</Button>
             <Button x:Name="matchupButton" DockPanel.Dock="Right" Height="25" IsEnabled="False" Click="MatchupButton_Click">Random matchup</Button>
         </DockPanel>
-        <Border DockPanel.Dock="Top" Margin="0 20" BorderThickness="1" BorderBrush="Gray"/>
         <DockPanel DockPanel.Dock="Bottom" Margin="0 20 0 0" LastChildFill="False">
             <Label DockPanel.Dock="Left" Height="25">Id:</Label>
             <TextBox DockPanel.Dock="Left" VerticalContentAlignment="Center" Margin="20 0" Height="25" Width="100" Name="idBox"></TextBox>
