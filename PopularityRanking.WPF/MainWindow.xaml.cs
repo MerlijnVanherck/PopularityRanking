@@ -61,6 +61,7 @@ namespace PopularityRanking.WPF
             rankingFileName.IsEnabled = true;
             matchupButton.IsEnabled = false;
             addParticipantButton.IsEnabled = false;
+            MaxScoreGrid.IsEnabled = false;
             UpdateRankingGrid();
         }
 
@@ -73,6 +74,7 @@ namespace PopularityRanking.WPF
                 rankingFileName.IsEnabled = false;
                 matchupButton.IsEnabled = true;
                 addParticipantButton.IsEnabled = true;
+                MaxScoreGrid.IsEnabled = true;
                 UpdateRankingGrid();
             }
             catch (Exception ex)
@@ -83,7 +85,7 @@ namespace PopularityRanking.WPF
 
         public void UpdateRankingGrid()
         {
-            ViewModel.ranking?.AssignScores();
+            ViewModel.ranking?.AssignScores(1, int.Parse(MaxScoreBox.Text));
             rankingGrid.ItemsSource = null;
             rankingGrid.ItemsSource = ViewModel.ranking?.Participants.Values;
         }
@@ -149,5 +151,21 @@ namespace PopularityRanking.WPF
             idBox.Text = "";
             nameBox.Text = "";
         }
+
+        private void ScoreUp_Click(object sender, RoutedEventArgs e)
+        {
+            MaxScoreBox.Text = (int.Parse(MaxScoreBox.Text) + 5).ToString();
+            UpdateRankingGrid();
+        }
+
+        private void ScoreDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (int.Parse(MaxScoreBox.Text) > 5)
+            {
+                MaxScoreBox.Text = (int.Parse(MaxScoreBox.Text) - 5).ToString();
+                UpdateRankingGrid();
+            }
+        }
+
     }
 }
