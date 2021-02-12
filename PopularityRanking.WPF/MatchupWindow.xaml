@@ -18,6 +18,7 @@
         <Label Name="LoserLabel" FontSize="10" Padding="3 0">Loser</Label>
         <DockPanel LastChildFill="False">
             <Button DockPanel.Dock="Left" Height="25" Margin="0 20 0 0" Name="RandomizeButton" Click="RandomizeButton_Click">Randomize</Button>
+            <Button DockPanel.Dock="Left" Height="25" Margin="20 20 0 0" Name="RivalsButton" Click="RivalsButton_Click">Rivals</Button>
             <Button DockPanel.Dock="Right" Height="25" IsEnabled="False" Margin="0 20 0 0" Name="ProcessMatchupButton" Click="ProcessMatchupButton_Click">Confirm matchup</Button>
         </DockPanel>
     </StackPanel>

@@ -37,19 +37,26 @@ namespace PopularityRanking.WPF
 
         public void ChooseRandomParticipants()
         {
-            var random = new Random();
-            int number = matchupPanel.Children.Count;
-            var list = new List<int>(number);
+            var comboboxes = new List<ComboBox>();
+            foreach (Grid c in matchupPanel.Children)
+                comboboxes.Add((ComboBox)c.Children[^1]);
 
-            while (list.Count != number)
-            {
-                var temp = random.Next() % ViewModel.ranking.Participants.Count;
-                if (!list.Contains(temp))
-                    list.Add(temp);
-            }
+            var participants = ViewModel.ranking.RandomMatchup(comboboxes.Count);
 
-            for (int i = 0; i < number; i++)
-                ((ComboBox)((Grid)(matchupPanel.Children[i])).Children[^1]).SelectedIndex = list[i];
+            for (int i = 0; i < comboboxes.Count; i++)
+                comboboxes[i].SelectedItem = participants[i];
+        }
+
+        public void ChooseRivalParticipants()
+        {
+            var comboboxes = new List<ComboBox>();
+            foreach (Grid c in matchupPanel.Children)
+                comboboxes.Add((ComboBox)c.Children[^1]);
+
+            var participants = ViewModel.ranking.RivalMatchup(comboboxes.Count);
+
+            for (int i = 0; i < comboboxes.Count; i++)
+                comboboxes[i].SelectedItem = participants[i];
         }
 
         private void ParticipantSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -286,6 +293,11 @@ namespace PopularityRanking.WPF
         private void RandomizeButton_Click(object sender, RoutedEventArgs e)
         {
             ChooseRandomParticipants();
+        }
+
+        private void RivalsButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void ScoredRankedToggle_Click(object sender, RoutedEventArgs e)
