@@ -31,12 +31,46 @@ namespace PopularityRanking
             if (Participants.Count < 2)
                 throw new ArgumentException("Cannot create matchups from an insufficiently populated participant list.");
 
-            var list = new List<Participant>();
+            var list = new List<Participant>(number);
             var rand = new Random();
 
             while (list.Count < number)
             {
-                var p = Participants[rand.Next(0, Participants.Count)];
+                var p = Participants.Values.ElementAt(rand.Next(0, Participants.Count));
+                if (!list.Contains(p))
+                    list.Add(p);
+            }
+
+            return list.ToArray();
+        }
+
+        public Participant[] RivalMatchup(int number)
+        {
+            if (number < 2)
+                throw new ArgumentException("A matchup must have at least 2 participants.");
+            if (number > Participants.Count)
+                throw new ArgumentException("A matchup can't be larger than the total number of participants.");
+            if (Participants.Count < 2)
+                throw new ArgumentException("Cannot create matchups from an insufficiently populated participant list.");
+
+            var list = new List<Participant>(number);
+            var rand = new Random();
+            var first = Participants.Values.ElementAt(rand.Next(0, Participants.Count));
+            list.Add(first);
+
+            var rivalList = Participants.Values.ToList()
+                .FindAll(p => Participant.AreRivals(first, p));
+
+            while (rivalList.Count < number - 1)
+            {
+                var p = Participants.Values.ElementAt(rand.Next(0, Participants.Count));
+                if (!rivalList.Contains(p) && p.Id != first.Id)
+                    rivalList.Add(p);
+            }
+
+            while (list.Count < number)
+            {
+                var p = rivalList[rand.Next(0, rivalList.Count)];
                 if (!list.Contains(p))
                     list.Add(p);
             }
