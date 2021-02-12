@@ -20,6 +20,7 @@ namespace PopularityRanking.WPF
     {
         private readonly MainWindow mainWindow;
         private bool isRankedMode = true;
+        private bool wantRivals = false;
 
         public MatchupWindow(MainWindow window)
         {
@@ -262,7 +263,10 @@ namespace PopularityRanking.WPF
             ViewModel.ranking.AssignScores();
             mainWindow.UpdateRankingGrid();
 
-            ChooseRandomParticipants();
+            if (wantRivals)
+                ChooseRivalParticipants();
+            else
+                ChooseRandomParticipants();
         }
 
         private void RunMatchupOrder()
@@ -293,11 +297,13 @@ namespace PopularityRanking.WPF
         private void RandomizeButton_Click(object sender, RoutedEventArgs e)
         {
             ChooseRandomParticipants();
+            wantRivals = false;
         }
 
         private void RivalsButton_Click(object sender, RoutedEventArgs e)
         {
             ChooseRivalParticipants();
+            wantRivals = true;
         }
 
         private void ScoredRankedToggle_Click(object sender, RoutedEventArgs e)
