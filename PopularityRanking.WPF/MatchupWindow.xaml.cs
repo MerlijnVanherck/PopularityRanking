@@ -297,7 +297,7 @@ namespace PopularityRanking.WPF
 
         private void RivalsButton_Click(object sender, RoutedEventArgs e)
         {
-
+            ChooseRivalParticipants();
         }
 
         private void ScoredRankedToggle_Click(object sender, RoutedEventArgs e)
