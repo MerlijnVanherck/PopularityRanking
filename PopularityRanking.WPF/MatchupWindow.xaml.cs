@@ -55,6 +55,7 @@ namespace PopularityRanking.WPF
                 comboboxes.Add((ComboBox)c.Children[^1]);
 
             var participants = ViewModel.ranking.RivalMatchup(comboboxes.Count);
+            participants = participants.OrderByDescending(p => p.Popularity).ToArray();
 
             for (int i = 0; i < comboboxes.Count; i++)
                 comboboxes[i].SelectedItem = participants[i];
